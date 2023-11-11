@@ -1,48 +1,39 @@
 package scene_moon
 
 import (
-	"fmt"
-	"image/color"
+	"log"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/t0l1k/dreamspell/lib"
+	"github.com/t0l1k/dreamspell/ui/icons"
 	"github.com/t0l1k/eui"
 )
 
 type SceneMoon struct {
-	dt         time.Time
-	moonBanner *MoonBanner
-	moonIcon   *MoonIcon
-	plazmas    []*PlazmaIcon
-	weeks      []*WeekIcon
-	days       []*DayIcon
-	eui.ContainerDefault
-	dirty   bool
-	lblYear *eui.Label
+	eui.SceneBase
+	dt             time.Time
+	moonBanner     *icons.MoonBanner
+	moonIcon       *icons.MoonIcon
+	plazmas        []*icons.PlazmaIcon
+	weeks          []*icons.MoonWeekIcon
+	days           []*icons.DayIcon
+	dirty          bool
+	lblYear, lblNs *eui.Text
 }
 
 func NewSceneMoon() *SceneMoon {
-	// layout := "2006.01.02"
-	// value := "2012.02.28"
-	// tm, err := time.Parse(layout, value)
-	// if err != nil {
-	// 	panic(err)
-	// }
 	return &SceneMoon{
-		// dt:    tm,
 		dt:    time.Now(),
 		dirty: true,
 	}
 }
 
 func (sc *SceneMoon) setup() {
-	rect := []int{0, 0, 1, 1}
-
 	if sc.plazmas == nil {
 		for _, plazma := range lib.GetPlazmas() {
-			p := NewPlazmaIcon(plazma, rect)
+			p := icons.NewPlazmaIcon(plazma)
 			sc.plazmas = append(sc.plazmas, p)
 			sc.Add(p)
 		}
@@ -53,7 +44,6 @@ func (sc *SceneMoon) setup() {
 	dtMoonBegin := sc.dt.Add(time.Duration(time.Hour * -24 * time.Duration(dayNr-1)))
 	tm0 := lib.NewConvert(dtMoonBegin.Format(layout))
 	day := tm0.FindMoonDayNr()
-	fmt.Println(day, day == 1, dayNr, dtMoonBegin.Format(layout), sc.dt.Format(layout))
 
 	if day > 1 {
 		dayNr := lib.NewConvert(sc.dt.Format(layout)).FindMoonDayNr()
@@ -69,45 +59,54 @@ func (sc *SceneMoon) setup() {
 	sEnd := end.Format(layout2)
 	sYear := sBeg + " - " + sEnd
 	if sc.lblYear == nil {
-		sc.lblYear = eui.NewLabel(sYear, rect, eui.GreenYellow, eui.Black)
+		bg := eui.GreenYellow
+		fg := eui.Black
+		sc.lblYear = eui.NewText(sYear)
+		sc.lblYear.Bg(bg)
+		sc.lblYear.Fg(fg)
 		sc.Add(sc.lblYear)
+		sc.lblNs = eui.NewText(tm0.GetNSShort())
+		sc.lblNs.Bg(bg)
+		sc.lblNs.Fg(fg)
+		sc.Add(sc.lblNs)
+
 	} else {
 		sc.lblYear.SetText(sYear)
+		sc.lblNs.SetText(tm0.GetNSShort())
 	}
 
 	if sc.moonBanner == nil {
-		sc.moonBanner = NewMoonBanner(dtMoonBegin, rect)
+		sc.moonBanner = icons.NewMoonBanner(dtMoonBegin)
 		sc.Add(sc.moonBanner)
 	} else {
-		sc.moonBanner.setup(dtMoonBegin)
+		sc.moonBanner.Setup(dtMoonBegin)
 	}
 
-	moonNr := tm0.FindMoonNr()
 	moonKin := tm0.FindMoonKin()
 	if sc.moonIcon == nil {
-		sc.moonIcon = NewMoonIcon(moonNr, moonKin, rect)
+		sc.moonIcon = icons.NewMoonIcon(moonKin)
 		sc.Add(sc.moonIcon)
 	} else {
-		sc.moonIcon.setup(moonNr, moonKin)
+		sc.moonIcon.Setup(moonKin)
 	}
 
 	mweek := tm0.FindMoonNr()*4 - 3
 	if sc.weeks == nil {
 		for week := 0; week < 4; week++ {
-			w := NewWeekIcon(week+mweek, rect)
+			w := icons.NewMoonWeekIcon(week + mweek)
 			sc.weeks = append(sc.weeks, w)
 			sc.Add(w)
 		}
 	} else {
 		for week := 0; week < 4; week++ {
-			sc.weeks[week].setup(week + mweek)
+			sc.weeks[week].Setup(week + mweek)
 		}
 	}
 
 	if sc.days == nil {
 		for i := 0; i < 28; i++ {
 			day := dtMoonBegin.Format(layout)
-			d := NewDayIcon(day, rect)
+			d := icons.NewDayIcon(day)
 			sc.days = append(sc.days, d)
 			sc.Add(d)
 			dtMoonBegin = sc.nextDay(dtMoonBegin)
@@ -115,7 +114,7 @@ func (sc *SceneMoon) setup() {
 	} else {
 		for i := 0; i < 28; i++ {
 			day := dtMoonBegin.Format(layout)
-			sc.days[i].setup(day)
+			sc.days[i].Setup(day)
 			dtMoonBegin = sc.nextDay(dtMoonBegin)
 		}
 	}
@@ -135,34 +134,28 @@ func (sc *SceneMoon) Entered() {
 	sc.setup()
 	sc.Resize()
 }
+
 func (sc *SceneMoon) Update(dt int) {
 	if sc.dirty {
 		sc.setup()
-	}
-	for _, v := range sc.Container {
-		v.Update(dt)
 	}
 
 	if inpututil.IsKeyJustReleased(ebiten.KeyF1) {
 		sc.dt = sc.dt.Add(time.Duration(time.Hour * 24 * 28))
 		sc.dirty = true
-		fmt.Println("F1", sc.dt)
+		log.Println("F1", sc.dt)
 	} else if inpututil.IsKeyJustReleased(ebiten.KeyF2) {
 		sc.dt = sc.dt.Add(time.Duration(time.Hour * -24 * 28))
 		sc.dirty = true
-		fmt.Println("F2", sc.dt)
+		log.Println("F2", sc.dt)
 	}
-}
-
-func (sc *SceneMoon) Draw(surface *ebiten.Image) {
-	surface.Fill(color.White)
 	for _, v := range sc.Container {
-		v.Draw(surface)
+		v.Update(dt)
 	}
 }
 
 func (sc *SceneMoon) Resize() {
-	w, h := ebiten.WindowSize()
+	w, h := eui.GetUi().Size()
 	r, c := 8, 6
 	sz := r
 	size := int(float64(w) * 0.95)
@@ -175,6 +168,7 @@ func (sc *SceneMoon) Resize() {
 	y0 := h/2 - cellSize*c/2
 	h2 := int(float64(h) * 0.05)
 	sc.lblYear.Resize([]int{x0 + cellSize*(r-2), y0 - h2/2, cellSize * 2, h2 / 2})
+	sc.lblNs.Resize([]int{x0, y0 - h2/2, cellSize, h2 / 2})
 	sc.moonBanner.Resize([]int{x0, y0, cellSize * r, cellSize})
 	y0 += cellSize
 	sc.moonIcon.Resize([]int{x0, y0, cellSize, cellSize})
@@ -199,11 +193,5 @@ func (sc *SceneMoon) Resize() {
 			x = x0
 		}
 		x += cellSize
-	}
-}
-
-func (sc *SceneMoon) Close() {
-	for _, v := range sc.Container {
-		v.Close()
 	}
 }

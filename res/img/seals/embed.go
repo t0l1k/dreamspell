@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"image"
+	_ "image/png"
 	"log"
 	"sync"
 

@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"log"
 	"strconv"
 )
 
@@ -14,7 +13,6 @@ type Kin struct {
 }
 
 func newKin(nr int) *Kin {
-	log.Println("Генерация кина", nr)
 	for nr > 260 {
 		nr -= 260
 	}

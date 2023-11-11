@@ -4,49 +4,34 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/t0l1k/dreamspell/lib"
 	"github.com/t0l1k/dreamspell/res/img/seals"
+	"github.com/t0l1k/dreamspell/ui/icons"
 	"github.com/t0l1k/eui"
 )
 
 type SceneTzolkin struct {
 	seals []*eui.Icon
-	kins  []*TzolkinKinIcon
-	eui.ContainerDefault
+	kins  []*icons.KinIcon
+	eui.SceneBase
 }
 
 func NewSceneTzolkin() *SceneTzolkin {
 	sc := &SceneTzolkin{}
-	rect := []int{0, 0, 1, 1}
 	for _, img := range seals.GetSealPngs().GetAll() {
-		seal := eui.NewIcon(ebiten.NewImageFromImage(img), rect)
+		seal := eui.NewIcon(ebiten.NewImageFromImage(img))
 		sc.seals = append(sc.seals, seal)
 		sc.Add(seal)
 	}
 	for _, kin := range lib.GetTzolkin().GetAll() {
-		kinIcon := NewTzolkinKinIcon(kin, rect)
+		kinIcon := icons.NewKinNrIcon(kin)
 		sc.kins = append(sc.kins, kinIcon)
 		sc.Add(kinIcon)
 	}
-
+	sc.Resize()
 	return sc
 }
 
-func (sc *SceneTzolkin) Entered() {
-	sc.Resize()
-}
-func (sc *SceneTzolkin) Update(dt int) {
-	for _, v := range sc.Container {
-		v.Update(dt)
-	}
-}
-
-func (sc *SceneTzolkin) Draw(surface *ebiten.Image) {
-	for _, v := range sc.Container {
-		v.Draw(surface)
-	}
-}
-
 func (sc *SceneTzolkin) Resize() {
-	w, h := ebiten.WindowSize()
+	w, h := eui.GetUi().Size()
 	sz := 20
 	size := w
 	if w > h {
@@ -75,11 +60,5 @@ func (sc *SceneTzolkin) Resize() {
 			y = y0
 			x += cellSize
 		}
-	}
-}
-
-func (sc *SceneTzolkin) Close() {
-	for _, v := range sc.Container {
-		v.Close()
 	}
 }
