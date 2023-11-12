@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -53,14 +52,12 @@ func (c *Convert) getNSCycle() (cycle, y int) {
 		year -= 1
 	}
 	if year >= rootYear {
-		fmt.Print("+")
 		for rootYear <= year {
 			cycle++
 			rootYear += 52
 		}
 		y = 52 - (rootYear - year)
 	} else if year <= rootYear {
-		fmt.Print("-")
 		for rootYear >= year {
 			cycle--
 			rootYear -= 52

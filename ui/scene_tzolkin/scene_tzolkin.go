@@ -12,53 +12,52 @@ type SceneTzolkin struct {
 	seals []*eui.Icon
 	kins  []*icons.KinIcon
 	eui.SceneBase
+	layout *eui.GridLayoutDownRight
 }
 
 func NewSceneTzolkin() *SceneTzolkin {
 	sc := &SceneTzolkin{}
+	sc.layout = eui.NewGridLayoutDownRight(14, 20)
 	for _, img := range seals.GetSealPngs().GetAll() {
 		seal := eui.NewIcon(ebiten.NewImageFromImage(img))
 		sc.seals = append(sc.seals, seal)
-		sc.Add(seal)
+		sc.layout.Add(seal)
 	}
 	for _, kin := range lib.GetTzolkin().GetAll() {
 		kinIcon := icons.NewKinNrIcon(kin)
 		sc.kins = append(sc.kins, kinIcon)
-		sc.Add(kinIcon)
+		sc.layout.Add(kinIcon)
 	}
+	sc.Add(sc.layout)
 	sc.Resize()
 	return sc
 }
 
-func (sc *SceneTzolkin) Resize() {
-	w, h := eui.GetUi().Size()
-	sz := 20
-	size := w
-	if w > h {
-		size = h
-	} else {
-		size = w
-	}
-	cellSize := size / sz
-	x0 := (w - cellSize*14) / 2
-	y0 := (h - cellSize*20) / 2
-	x, y := x0, y0
-	w1 := cellSize
-	h1 := cellSize
-	for _, icon := range sc.seals {
-		icon.Resize([]int{x, y, w1, h1})
-		y += cellSize
-	}
-	y = y0
-	x += cellSize
-	i := 0
-	for _, icon := range sc.kins {
-		icon.Resize([]int{x, y, w1, h1})
-		y += cellSize
-		i++
-		if i > 0 && i%20 == 0 {
-			y = y0
-			x += cellSize
+func (s *SceneTzolkin) Update(dt int) {
+	for _, v := range s.Container {
+		v.Update(dt)
+		vv, ok := v.(*eui.GridLayoutDownRight)
+		if ok {
+			for _, v := range vv.Container {
+				v.Update(dt)
+			}
 		}
 	}
+}
+
+func (s *SceneTzolkin) Draw(surface *ebiten.Image) {
+	for _, v := range s.Container {
+		v.Draw(surface)
+		vv, ok := v.(*eui.GridLayoutDownRight)
+		if ok {
+			for _, v := range vv.Container {
+				v.Draw(surface)
+			}
+		}
+	}
+}
+
+func (sc *SceneTzolkin) Resize() {
+	w0, h0 := eui.GetUi().Size()
+	sc.layout.Resize([]int{0, 0, w0, h0})
 }
