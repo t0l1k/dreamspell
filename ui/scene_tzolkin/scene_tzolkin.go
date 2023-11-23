@@ -18,6 +18,7 @@ type SceneTzolkin struct {
 func NewSceneTzolkin() *SceneTzolkin {
 	sc := &SceneTzolkin{}
 	sc.layout = eui.NewGridLayoutDownRight(14, 20)
+	sc.layout.SetCellMargin(1)
 	for _, img := range seals.GetSealPngs().GetAll() {
 		seal := eui.NewIcon(ebiten.NewImageFromImage(img))
 		sc.seals = append(sc.seals, seal)

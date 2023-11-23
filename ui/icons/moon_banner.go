@@ -1,7 +1,6 @@
 package icons
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -12,14 +11,14 @@ import (
 
 type MoonBanner struct {
 	eui.View
-	dt                                                  time.Time
-	yearKinIcon                                         *KinIcon
-	lblYearKin, lblTotem, moonLbl                       *eui.Text
-	moonQuestionLbl, moonFuncLbl, moonNrLbl             *eui.Text
-	moonPeriodLbl, moonPeriodDaysLbl, moonPeriodKinsLbl *eui.Text
-	moonFunc0, moonFunc1, moonFunc2                     *eui.Text
-	moonTonImg                                          *eui.Icon
-	str3                                                []string
+	dt                              time.Time
+	yearKinIcon                     *KinIcon
+	lblYearKin, lblTotem, moonLbl   *eui.Text
+	moonQuestionLbl, moonFuncLbl    *eui.Text
+	moonFunc0, moonFunc1, moonFunc2 *eui.Text
+	moonTonImg                      *eui.Icon
+	str3                            []string
+	YearBanner                      *YearBanner
 }
 
 func NewMoonBanner(dt time.Time) *MoonBanner {
@@ -31,12 +30,11 @@ func NewMoonBanner(dt time.Time) *MoonBanner {
 
 	i.yearKinIcon = NewKinSealIcon(yearKin)
 	i.Add(i.yearKinIcon)
+	i.lblYearKin = eui.NewText("Кин года")
+	i.Add(i.lblYearKin)
 
 	i.moonTonImg = eui.NewIcon(ebiten.NewImageFromImage(moon.GetMoonPngs().Get(lib.Ton(moonNr))))
 	i.Add(i.moonTonImg)
-
-	i.lblYearKin = eui.NewText("Кин года")
-	i.Add(i.lblYearKin)
 
 	i.lblTotem = eui.NewText("")
 	i.Add(i.lblTotem)
@@ -46,20 +44,15 @@ func NewMoonBanner(dt time.Time) *MoonBanner {
 	i.Add(i.moonQuestionLbl)
 	i.moonFuncLbl = eui.NewText("")
 	i.Add(i.moonFuncLbl)
-	i.moonNrLbl = eui.NewText("")
-	i.Add(i.moonNrLbl)
-	i.moonPeriodLbl = eui.NewText("")
-	i.Add(i.moonPeriodLbl)
-	i.moonPeriodDaysLbl = eui.NewText("")
-	i.Add(i.moonPeriodDaysLbl)
-	i.moonPeriodKinsLbl = eui.NewText("")
-	i.Add(i.moonPeriodKinsLbl)
 	i.moonFunc0 = eui.NewText("")
 	i.Add(i.moonFunc0)
 	i.moonFunc1 = eui.NewText("")
 	i.Add(i.moonFunc1)
 	i.moonFunc2 = eui.NewText("")
 	i.Add(i.moonFunc2)
+
+	i.YearBanner = NewYearBanner(dt)
+	i.Add(i.YearBanner)
 
 	i.Setup(dt)
 	return i
@@ -68,10 +61,7 @@ func NewMoonBanner(dt time.Time) *MoonBanner {
 func (i *MoonBanner) Setup(dt0 time.Time) {
 	i.dt = dt0
 
-	layout := "2006.01.02"
-	layout2 := "02 Jan 2006"
-
-	tm0, yearKin, moonNr := i.calcTm()
+	_, yearKin, moonNr := i.calcTm()
 
 	bg0 := eui.White
 	fg0 := eui.Black
@@ -104,32 +94,6 @@ func (i *MoonBanner) Setup(dt0 time.Time) {
 	i.moonFuncLbl.Bg(bg0)
 	i.moonFuncLbl.Fg(fg0)
 
-	bg1 := eui.GreenYellow
-	fg1 := eui.Black
-
-	str = lib.Ton(moonNr).MoonNrRus() + " Луна"
-
-	i.moonNrLbl.SetText(str)
-	i.moonNrLbl.Bg(bg1)
-	i.moonNrLbl.Fg(fg1)
-
-	dt := i.dt.Add(time.Duration(time.Hour * 24 * 27))
-	str = i.dt.Format(layout2) + " - " + dt.Format(layout2)
-	i.moonPeriodLbl.SetText(str)
-	i.moonPeriodLbl.Bg(bg1)
-	i.moonPeriodLbl.Fg(fg1)
-
-	tm1 := lib.NewConvert(dt.Format(layout))
-	str = "Дни " + strconv.Itoa(tm0.FindDayInYear()) + " - " + strconv.Itoa(tm1.FindDayInYear())
-	i.moonPeriodDaysLbl.SetText(str)
-	i.moonPeriodDaysLbl.Bg(bg1)
-	i.moonPeriodDaysLbl.Fg(fg1)
-
-	str = "Кины " + strconv.Itoa(tm0.FindKin().GetNr()) + " - " + strconv.Itoa(tm1.FindKin().GetNr())
-	i.moonPeriodKinsLbl.SetText(str)
-	i.moonPeriodKinsLbl.Bg(bg1)
-	i.moonPeriodKinsLbl.Fg(fg1)
-
 	i.str3 = lib.Ton(moonNr).MoonFunc3Rus()
 	i.moonFunc0.SetText(i.str3[0])
 	i.moonFunc0.Bg(bg0)
@@ -140,6 +104,8 @@ func (i *MoonBanner) Setup(dt0 time.Time) {
 	i.moonFunc2.SetText(i.str3[2])
 	i.moonFunc2.Bg(bg0)
 	i.moonFunc2.Fg(fg0)
+
+	i.YearBanner.Setup(dt0)
 }
 
 func (i *MoonBanner) calcTm() (*lib.Convert, *lib.Kin, int) {
@@ -152,23 +118,23 @@ func (i *MoonBanner) calcTm() (*lib.Convert, *lib.Kin, int) {
 
 func (i *MoonBanner) Resize(rect []int) {
 	i.View.Resize(rect)
-	x, y, w, h := i.GetRect().X, i.GetRect().Y, i.GetRect().W, i.GetRect().H
+	x, y, w, _ := i.GetRect().X, i.GetRect().Y, i.GetRect().W, i.GetRect().H
 	sz8 := i.GetRect().GetLowestSize() / 8
-	i.yearKinIcon.Resize([]int{x, y, sz8 * 8, sz8 * 6})
-	i.lblYearKin.Resize([]int{x + sz8, y + sz8*6, sz8 * 6, sz8 * 2})
-	i.moonTonImg.Resize([]int{x + sz8*8, y, sz8 * 8, sz8 * 6})
-	i.lblTotem.Resize([]int{x + sz8*9, y + sz8*6, sz8 * 6, sz8 * 2})
-	i.moonLbl.Resize([]int{x + h*2, y, w / 2, sz8 * 4})
-	i.moonQuestionLbl.Resize([]int{x + h*2, y + sz8*4, w / 2, sz8 * 2})
-	i.moonFuncLbl.Resize([]int{x + h*2, y + sz8*6, w / 2, sz8 * 2})
-	i.moonNrLbl.Resize([]int{x + w - w/2 + h*2, y, w/2 - h*2, sz8})
-	i.moonPeriodLbl.Resize([]int{x + (w - w/2 + h*2), y + sz8, w/2 - h*2, sz8})
-	i.moonPeriodDaysLbl.Resize([]int{x + (w - w/2 + h*2), y + sz8*2, w/2 - h*2, sz8})
-	i.moonPeriodKinsLbl.Resize([]int{x + (w - w/2 + h*2), y + sz8*3, w/2 - h*2, sz8})
+	cellSize := w / 8
+	i.moonTonImg.Resize([]int{x, y, cellSize, sz8 * 6})
+	i.lblTotem.Resize([]int{x, y + sz8*6, cellSize, sz8 * 2})
+	i.moonLbl.Resize([]int{x + cellSize, y, cellSize * 4, cellSize / 2})
+	i.moonQuestionLbl.Resize([]int{x + cellSize, y + cellSize/2, cellSize * 3, sz8 * 2})
+	i.moonFuncLbl.Resize([]int{x + cellSize, y + sz8*6, cellSize * 3, sz8 * 2})
 
 	sz8a := int(float64(sz8) * 1.2)
+	i.moonFunc0.Resize([]int{x + cellSize*4, y + sz8*4, cellSize, sz8a})
+	i.moonFunc1.Resize([]int{x + cellSize*4, y + sz8*4 + sz8a, cellSize, sz8a})
+	i.moonFunc2.Resize([]int{x + cellSize*4, y + sz8*4 + sz8a*2, cellSize, sz8a})
 
-	i.moonFunc0.Resize([]int{x + w - w/2 + h*2, y + sz8*4, w/2 - h*2, sz8a})
-	i.moonFunc1.Resize([]int{x + w - w/2 + h*2, y + sz8*4 + sz8a, w/2 - h*2, sz8a})
-	i.moonFunc2.Resize([]int{x + w - w/2 + h*2, y + sz8*4 + sz8a*2, w/2 - h*2, sz8a})
+	i.YearBanner.Resize([]int{x + cellSize*5, y, cellSize * 2, cellSize})
+
+	i.yearKinIcon.Resize([]int{x + cellSize*7, y, cellSize, sz8 * 6})
+	i.lblYearKin.Resize([]int{x + cellSize*7, y + sz8*6, cellSize, sz8 * 2})
+
 }

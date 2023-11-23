@@ -13,15 +13,14 @@ import (
 
 type SceneMoon struct {
 	eui.SceneBase
-	dt             time.Time
-	moonBanner     *icons.MoonBanner
-	moonIcon       *icons.MoonIcon
-	plazmas        []*icons.PlazmaIcon
-	weeks          []*icons.MoonWeekIcon
-	days           []*icons.DayIcon
-	dirty          bool
-	lblYear, lblNs *eui.Text
-	layout         *eui.GridLayoutRightDown
+	dt         time.Time
+	moonBanner *icons.MoonBanner
+	moonIcon   *icons.MoonIcon
+	plazmas    []*icons.PlazmaIcon
+	weeks      []*icons.MoonWeekIcon
+	days       []*icons.DayIcon
+	dirty      bool
+	layout     *eui.GridLayoutRightDown
 }
 
 func NewSceneMoon() *SceneMoon {
@@ -44,30 +43,6 @@ func (sc *SceneMoon) setup() {
 		tm0 = lib.NewConvert(dtMoonBegin.Format(layout))
 	}
 
-	layout2 := "02 Jan 2006"
-
-	beg := tm0.FindDreamspellYearBeginDate()
-	end := time.Date(beg.Year()+1, time.July, 25, 0, 0, 0, 0, time.Local)
-	sBeg := beg.Format(layout2)
-	sEnd := end.Format(layout2)
-	sYear := sBeg + " - " + sEnd
-	if sc.lblYear == nil {
-		bg := eui.GreenYellow
-		fg := eui.Black
-		sc.lblYear = eui.NewText(sYear)
-		sc.lblYear.Bg(bg)
-		sc.lblYear.Fg(fg)
-		sc.Add(sc.lblYear)
-		sc.lblNs = eui.NewText(tm0.GetNSShort())
-		sc.lblNs.Bg(bg)
-		sc.lblNs.Fg(fg)
-		sc.Add(sc.lblNs)
-
-	} else {
-		sc.lblYear.SetText(sYear)
-		sc.lblNs.SetText(tm0.GetNSShort())
-	}
-
 	if sc.moonBanner == nil {
 		sc.moonBanner = icons.NewMoonBanner(dtMoonBegin)
 		sc.Add(sc.moonBanner)
@@ -77,6 +52,7 @@ func (sc *SceneMoon) setup() {
 
 	if sc.layout == nil {
 		sc.layout = eui.NewGridLayoutRightDown(8, 5)
+		sc.layout.SetCellMargin(1)
 	}
 
 	moonKin := tm0.FindMoonKin()
@@ -153,6 +129,7 @@ func (sc *SceneMoon) Update(dt int) {
 }
 
 func (s *SceneMoon) Draw(surface *ebiten.Image) {
+	// surface.Fill(eui.White)
 	for _, v0 := range s.Container {
 		v0.Draw(surface)
 	}
@@ -165,18 +142,15 @@ func (sc *SceneMoon) Resize() {
 	w, h := eui.GetUi().Size()
 	r, c := 8, 6
 	sz := r
-	size := int(float64(w) * 0.95)
+	size := int(float64(w) * 0.99)
 	if w > h {
-		size = int(float64(h) * 0.95)
+		size = int(float64(h) * 0.99)
 		sz = c
 	}
 	cellSize := int(size / sz)
 	x0 := w/2 - cellSize*r/2
 	y0 := h/2 - cellSize*c/2
-	h2 := int(float64(h) * 0.05)
-	sc.lblYear.Resize([]int{x0 + cellSize*(r-2), y0 - h2/2, cellSize * 2, h2 / 2})
-	sc.lblNs.Resize([]int{x0, y0 - h2/2, cellSize, h2 / 2})
 	sc.moonBanner.Resize([]int{x0, y0, cellSize * r, cellSize})
 	y0 += cellSize
-	sc.layout.Resize([]int{x0, y0, cellSize * 8, cellSize * 5})
+	sc.layout.Resize([]int{x0, y0, cellSize * r, cellSize * (c - 1)})
 }
