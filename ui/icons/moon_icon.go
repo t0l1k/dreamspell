@@ -24,11 +24,10 @@ func NewMoonIcon(moonKin *lib.Kin) *MoonIcon {
 
 func (i *MoonIcon) Setup(kin *lib.Kin) {
 	i.icon.Setup(kin)
-	bg0 := eui.White
-	fg0 := eui.Black
-	i.Bg(bg0)
-	i.lbl.Bg(bg0)
-	i.lbl.Fg(fg0)
+	i.Bg(i.icon.GetBg())
+	i.Fg(i.icon.GetFg())
+	i.lbl.Bg(i.icon.GetBg())
+	i.lbl.Fg(i.icon.GetFg())
 }
 
 func (i *MoonIcon) Resize(rect []int) {

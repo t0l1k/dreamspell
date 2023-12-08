@@ -20,7 +20,7 @@ func NewSceneTzolkin() *SceneTzolkin {
 	sc.layout = eui.NewGridLayoutDownRight(14, 20)
 	sc.layout.SetCellMargin(1)
 	for _, img := range seals.GetSealPngs().GetAll() {
-		seal := eui.NewIcon(ebiten.NewImageFromImage(img))
+		seal := eui.NewIcon(img)
 		sc.seals = append(sc.seals, seal)
 		sc.layout.Add(seal)
 	}

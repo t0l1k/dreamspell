@@ -1,7 +1,6 @@
 package icons
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/t0l1k/dreamspell/lib"
 	"github.com/t0l1k/dreamspell/res/img/plazmas"
 	"github.com/t0l1k/eui"
@@ -19,7 +18,7 @@ func NewPlazmaIcon(plazma lib.Plazma) *PlazmaIcon {
 	i.SetupView()
 	i.plazma = plazma
 
-	i.plazmaIcon = eui.NewIcon(ebiten.NewImageFromImage(plazmas.GetPlazmaPngs().Get(i.plazma)))
+	i.plazmaIcon = eui.NewIcon(plazmas.GetPlazmaPngs().Get(i.plazma))
 	i.Add(i.plazmaIcon)
 
 	i.lblPlazma = eui.NewText(i.plazma.String())
@@ -38,7 +37,7 @@ func (i *PlazmaIcon) Setup(p lib.Plazma) {
 	fg0 := eui.Black
 	i.Bg(bg0)
 
-	i.plazmaIcon.SetIcon(ebiten.NewImageFromImage(plazmas.GetPlazmaPngs().Get(i.plazma)))
+	i.plazmaIcon.SetIcon(plazmas.GetPlazmaPngs().Get(i.plazma))
 	i.plazmaIcon.Bg(bg0)
 
 	i.lblPlazma.SetText(i.plazma.String())

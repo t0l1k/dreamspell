@@ -4,6 +4,8 @@ import (
 	"bytes"
 	_ "embed"
 	"image"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 var (
@@ -17,14 +19,15 @@ var (
 	EmptySymbolPng []byte
 )
 
-func GetSignPngs() (arr []image.Image) {
+func GetSignPngs() (arr []*ebiten.Image) {
 	signPngs := [][]byte{ClearSignSymbolPng, HiddenSignSymbolPng, PolarSymbolPng, EmptySymbolPng}
 	for _, png := range signPngs {
 		img, _, err := image.Decode(bytes.NewReader(png))
 		if err != nil {
 			panic(err)
 		}
-		arr = append(arr, img)
+		im := ebiten.NewImageFromImage(img)
+		arr = append(arr, im)
 	}
 	return arr
 }

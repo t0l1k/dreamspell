@@ -4,7 +4,6 @@ import (
 	"image/color"
 	"strconv"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/t0l1k/dreamspell/lib"
 	"github.com/t0l1k/dreamspell/res/img/seals"
 	"github.com/t0l1k/dreamspell/res/img/symbols"
@@ -18,6 +17,7 @@ type KinIcon struct {
 	nr                      *eui.Text
 	ton, seal, signL, signR *eui.Icon
 	sealOn                  bool
+	bg, fg                  color.RGBA
 }
 
 func NewKinNrIcon(kin *lib.Kin) *KinIcon {
@@ -34,53 +34,30 @@ func NewKinSealIcon(kin *lib.Kin) *KinIcon {
 	return i
 }
 
+func (i *KinIcon) GetBg() color.Color {
+	return i.bg
+}
+
+func (i *KinIcon) GetFg() color.Color {
+	return i.fg
+}
+
 func (i *KinIcon) Setup(kin *lib.Kin) {
 	i.SetupView()
 	i.kin = kin
-	clrs := []color.RGBA{eui.Red, eui.White, eui.Blue, eui.Yellow}
-	nr := i.kin.GetColor() - 1
-	var bg, fg color.RGBA
-	if i.kin.IsPga() {
-		bg = eui.Green
-		fg = eui.Black
-	} else {
-		bg = clrs[nr]
-		if bg == clrs[0] && bg == clrs[2] {
-			fg = eui.White
-		} else {
-			fg = eui.Black
-		}
-	}
-	if i.kin.IsCentral() {
-		bg = clrs[nr]
-		r := bg.R
-		g := bg.G
-		b := bg.B
-		a := bg.A
-		v := uint8(64)
-		if r == 255 {
-			r -= v
-		}
-		if g == 255 {
-			g -= v
-		}
-		if b == 255 {
-			b -= v
-		}
-		bg = color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)}
-	}
-	i.Bg(bg)
+	i.setColors()
+	i.Bg(i.bg)
 
-	tonImg := ebiten.NewImageFromImage(tons.GetTonPngs().Get(i.kin.GetTon()))
+	tonImg := tons.GetTonPngs().Get(i.kin.GetTon())
 	if i.ton == nil {
 		i.ton = eui.NewIcon(tonImg)
 		i.Add(i.ton)
 	} else {
 		i.ton.SetIcon(tonImg)
 	}
-	i.ton.Bg(bg)
+	i.ton.Bg(i.bg)
 
-	sealImg := ebiten.NewImageFromImage(seals.GetSealPngs().Get(i.kin.GetSeal()))
+	sealImg := seals.GetSealPngs().Get(i.kin.GetSeal())
 	if i.sealOn && i.seal == nil {
 		i.seal = eui.NewIcon(sealImg)
 		i.Add(i.seal)
@@ -92,38 +69,72 @@ func (i *KinIcon) Setup(kin *lib.Kin) {
 
 	if i.sealOn {
 		i.seal.SetIcon(sealImg)
-		i.seal.Bg(bg)
+		i.seal.Bg(i.bg)
 		i.nr.SetText(strconv.Itoa(int(i.kin.GetNr())))
 	} else if !i.sealOn {
 		i.nr.SetText(strconv.Itoa(int(i.kin.GetNr())))
 	}
-	i.nr.Bg(bg)
-	i.nr.Fg(fg)
+	i.nr.Bg(i.bg)
+	i.nr.Fg(i.fg)
 
-	img := ebiten.NewImageFromImage(symbols.GetSignPngs()[3])
+	img := symbols.GetSignPngs()[3]
 	if i.signL == nil {
 		i.signL = eui.NewIcon(img)
 		i.Add(i.signL)
 	}
 	if i.kin.IsClearSign() {
-		i.signL.SetIcon(ebiten.NewImageFromImage(symbols.GetSignPngs()[0]))
+		i.signL.SetIcon(symbols.GetSignPngs()[0])
 	} else if i.kin.IsHiddenSign() {
-		i.signL.SetIcon(ebiten.NewImageFromImage(symbols.GetSignPngs()[1]))
+		i.signL.SetIcon(symbols.GetSignPngs()[1])
 	} else {
 		i.signL.SetIcon(img)
 	}
-	i.signL.Bg(bg)
+	i.signL.Bg(i.bg)
 
 	if i.signR == nil {
 		i.signR = eui.NewIcon(img)
 		i.Add(i.signR)
 	}
 	if i.kin.IsPolar() {
-		i.signR.SetIcon(ebiten.NewImageFromImage(symbols.GetSignPngs()[2]))
+		i.signR.SetIcon(symbols.GetSignPngs()[2])
 	} else {
 		i.signR.SetIcon(img)
 	}
-	i.signR.Bg(bg)
+	i.signR.Bg(i.bg)
+}
+
+func (i *KinIcon) setColors() {
+	clrs := []color.RGBA{eui.Red, eui.White, eui.Blue, eui.Yellow}
+	nr := i.kin.GetColor() - 1
+	if i.kin.IsPga() {
+		i.bg = eui.Green
+		i.fg = eui.Black
+	} else {
+		i.bg = clrs[nr]
+		if i.bg == clrs[0] && i.bg == clrs[2] {
+			i.fg = eui.White
+		} else {
+			i.fg = eui.Black
+		}
+	}
+	if i.kin.IsCentral() {
+		i.bg = clrs[nr]
+		r := i.bg.R
+		g := i.bg.G
+		b := i.bg.B
+		a := i.bg.A
+		v := uint8(64)
+		if r == 255 {
+			r -= v
+		}
+		if g == 255 {
+			g -= v
+		}
+		if b == 255 {
+			b -= v
+		}
+		i.bg = color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)}
+	}
 }
 
 func (i *KinIcon) Resize(rect []int) {

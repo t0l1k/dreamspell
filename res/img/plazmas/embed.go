@@ -7,6 +7,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/t0l1k/dreamspell/lib"
 )
 
@@ -38,34 +39,35 @@ func GetPlazmaPngs() *plazmaImageCashe {
 }
 
 type plazmaImageCashe struct {
-	cache map[lib.Plazma]*image.Image
+	cache map[lib.Plazma]*ebiten.Image
 }
 
 func newTonPngsCache() *plazmaImageCashe {
 	log.Println("Генерация иконок плазм")
 	s := &plazmaImageCashe{}
 	plazmaPngs := [][]byte{Dali, Seli, Gamma, Kali, Alpha, Limi, Silio}
-	s.cache = make(map[lib.Plazma]*image.Image)
+	s.cache = make(map[lib.Plazma]*ebiten.Image)
 	for _, plazma := range lib.GetPlazmas() {
 		img, _, err := image.Decode(bytes.NewReader(plazmaPngs[int(plazma)-1]))
 		if err != nil {
 			panic(err)
 		}
-		s.cache[plazma] = &img
+		im := ebiten.NewImageFromImage(img)
+		s.cache[plazma] = im
 	}
 	return s
 }
 
-func (s *plazmaImageCashe) Get(plazma lib.Plazma) image.Image {
+func (s *plazmaImageCashe) Get(plazma lib.Plazma) *ebiten.Image {
 	if img, ok := s.cache[plazma]; ok {
-		return *img
+		return img
 	}
 	return nil
 }
 
-func (s *plazmaImageCashe) GetAll() (arr []image.Image) {
+func (s *plazmaImageCashe) GetAll() (arr []*ebiten.Image) {
 	for _, plazma := range lib.GetPlazmas() {
-		arr = append(arr, *s.cache[plazma])
+		arr = append(arr, s.cache[plazma])
 	}
 	return arr
 }

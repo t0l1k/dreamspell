@@ -4,7 +4,6 @@ import (
 	"image/color"
 	"strconv"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/t0l1k/dreamspell/lib"
 	"github.com/t0l1k/dreamspell/res/img/tons"
 	"github.com/t0l1k/eui"
@@ -33,8 +32,8 @@ func NewMoonWeekIcon(week int) *MoonWeekIcon {
 
 func (i *MoonWeekIcon) Setup(week int) {
 	i.calcWeekNrs(week)
-	i.moonIcon.SetIcon(ebiten.NewImageFromImage(tons.GetTonPngs().Get(lib.Ton(i.mweek))))
-	i.quarIcon.SetIcon(ebiten.NewImageFromImage(tons.GetTonPngs().Get(lib.Ton(i.qweek))))
+	i.moonIcon.SetIcon(tons.GetTonPngs().Get(lib.Ton(i.mweek)))
+	i.quarIcon.SetIcon(tons.GetTonPngs().Get(lib.Ton(i.qweek)))
 	i.yearLbl.SetText(strconv.Itoa(i.week))
 	clrs := []color.Color{eui.Red, eui.White, eui.Blue, eui.Yellow}
 	bg := clrs[int(lib.SealColor(i.mweek)-1)]
