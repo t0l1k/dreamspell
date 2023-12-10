@@ -1,15 +1,8 @@
 package tons
 
 import (
-	"bytes"
 	_ "embed"
-	"image"
 	_ "image/png"
-	"log"
-	"sync"
-
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/t0l1k/dreamspell/lib"
 )
 
 var (
@@ -40,47 +33,3 @@ var (
 	//go:embed  13.png
 	CosmicPng []byte
 )
-
-var tonPngsInstance *TonImageCashe
-var once sync.Once
-
-func GetTonPngs() *TonImageCashe {
-	once.Do(func() {
-		tonPngsInstance = newTonPngsCache()
-	})
-	return tonPngsInstance
-}
-
-type TonImageCashe struct {
-	cache map[lib.Ton]*ebiten.Image
-}
-
-func newTonPngsCache() *TonImageCashe {
-	log.Println("Генерация иконок тонов")
-	s := &TonImageCashe{}
-	tonPngs := [][]byte{MagneticPng, LunarPng, ElectricPng, SelfExistingPng, OvertonePng, RhtythmicPng, ResonantPng, GalacticPng, SolarPng, PlanetaryPng, SpectralPng, CrystalPng, CosmicPng}
-	s.cache = make(map[lib.Ton]*ebiten.Image)
-	for _, ton := range lib.GetTons() {
-		img, _, err := image.Decode(bytes.NewReader(tonPngs[int(ton)-1]))
-		if err != nil {
-			panic(err)
-		}
-		im := ebiten.NewImageFromImage(img)
-		s.cache[ton] = im
-	}
-	return s
-}
-
-func (s *TonImageCashe) Get(ton lib.Ton) *ebiten.Image {
-	if img, ok := s.cache[ton]; ok {
-		return img
-	}
-	return nil
-}
-
-func (s *TonImageCashe) GetAll() (arr []*ebiten.Image) {
-	for _, ton := range lib.GetTons() {
-		arr = append(arr, s.cache[ton])
-	}
-	return arr
-}

@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/t0l1k/dreamspell/lib"
-	"github.com/t0l1k/dreamspell/res/img/tons"
+	"github.com/t0l1k/dreamspell/res"
 	"github.com/t0l1k/eui"
 )
 
@@ -32,8 +32,8 @@ func NewMoonWeekIcon(week int) *MoonWeekIcon {
 
 func (i *MoonWeekIcon) Setup(week int) {
 	i.calcWeekNrs(week)
-	i.moonIcon.SetIcon(tons.GetTonPngs().Get(lib.Ton(i.mweek)))
-	i.quarIcon.SetIcon(tons.GetTonPngs().Get(lib.Ton(i.qweek)))
+	i.moonIcon.SetIcon(res.GetTonAll()[lib.Ton(i.mweek-1)])
+	i.quarIcon.SetIcon(res.GetTonAll()[lib.Ton(i.qweek-1)])
 	i.yearLbl.SetText(strconv.Itoa(i.week))
 	clrs := []color.Color{eui.Red, eui.White, eui.Blue, eui.Yellow}
 	bg := clrs[int(lib.SealColor(i.mweek)-1)]

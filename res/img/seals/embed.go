@@ -1,15 +1,8 @@
 package seals
 
 import (
-	"bytes"
 	_ "embed"
-	"image"
 	_ "image/png"
-	"log"
-	"sync"
-
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/t0l1k/dreamspell/lib"
 )
 
 var (
@@ -54,51 +47,3 @@ var (
 	//go:embed  19.png
 	StormPng []byte
 )
-
-var sealPngsInstance *SealsImageCashe
-var once sync.Once
-
-func GetSealPngs() *SealsImageCashe {
-	once.Do(func() {
-		sealPngsInstance = newSealPngsCache()
-	})
-	return sealPngsInstance
-}
-
-type SealsImageCashe struct {
-	cache map[lib.Seal]*ebiten.Image
-}
-
-func newSealPngsCache() *SealsImageCashe {
-	log.Println("Генерация иконок печатей")
-	s := &SealsImageCashe{}
-	pngs := [][]byte{SunPng, DragonPng, WindPng, NightPng, SeedPng, SerpentPng, WorldBridgerPng, HandPng, StarPng, MoonPng, DogPng, MonkeyPng, HumanPng, SkyWalkerPng, WizzardPng, EaglePng, WarriorPng, EarthPng, MirrorPng, StormPng}
-	s.cache = make(map[lib.Seal]*ebiten.Image)
-	for _, seal := range lib.GetSeals() {
-		img, _, err := image.Decode(bytes.NewReader(pngs[int(seal)]))
-		if err != nil {
-			panic(err)
-		}
-		im := ebiten.NewImageFromImage(img)
-		s.cache[seal] = im
-	}
-	return s
-}
-
-func (s *SealsImageCashe) Get(seal lib.Seal) *ebiten.Image {
-	if img, ok := s.cache[seal]; ok {
-		return img
-	}
-	return nil
-}
-
-func (s *SealsImageCashe) GetAll() (arr []*ebiten.Image) {
-	for _, seal := range lib.GetSeals() {
-		if seal == lib.SUN {
-			continue
-		}
-		arr = append(arr, s.cache[seal])
-	}
-	arr = append(arr, s.cache[lib.SUN])
-	return arr
-}

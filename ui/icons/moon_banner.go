@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/t0l1k/dreamspell/lib"
-	"github.com/t0l1k/dreamspell/res/img/moon"
+	"github.com/t0l1k/dreamspell/res"
 	"github.com/t0l1k/eui"
 )
 
@@ -26,7 +26,7 @@ func NewMoonBanner(dt time.Time) *MoonBanner {
 
 	_, moonNr := i.calcTm()
 
-	i.moonTonImg = eui.NewIcon(moon.GetMoonPngs().Get(lib.Ton(moonNr)))
+	i.moonTonImg = eui.NewIcon(res.GetMoonTonAll()[lib.Ton(moonNr-1)])
 	i.Add(i.moonTonImg)
 
 	i.lblTotem = eui.NewText("")
@@ -60,7 +60,7 @@ func (i *MoonBanner) Setup(dt0 time.Time) {
 	fg0 := eui.Black
 	i.Bg(bg0)
 
-	i.moonTonImg.SetIcon(moon.GetMoonPngs().Get(lib.Ton(moonNr)))
+	i.moonTonImg.SetIcon(res.GetMoonTonAll()[lib.Ton(moonNr-1)])
 
 	s := lib.Ton(moonNr).TotemRus()
 	i.lblTotem.SetText("Тотем " + s)

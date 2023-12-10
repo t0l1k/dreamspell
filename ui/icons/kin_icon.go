@@ -5,9 +5,7 @@ import (
 	"strconv"
 
 	"github.com/t0l1k/dreamspell/lib"
-	"github.com/t0l1k/dreamspell/res/img/seals"
-	"github.com/t0l1k/dreamspell/res/img/symbols"
-	"github.com/t0l1k/dreamspell/res/img/tons"
+	"github.com/t0l1k/dreamspell/res"
 	"github.com/t0l1k/eui"
 )
 
@@ -48,7 +46,7 @@ func (i *KinIcon) Setup(kin *lib.Kin) {
 	i.setColors()
 	i.Bg(i.bg)
 
-	tonImg := tons.GetTonPngs().Get(i.kin.GetTon())
+	tonImg := res.GetTonAll()[i.kin.GetTon()-1]
 	if i.ton == nil {
 		i.ton = eui.NewIcon(tonImg)
 		i.Add(i.ton)
@@ -57,7 +55,7 @@ func (i *KinIcon) Setup(kin *lib.Kin) {
 	}
 	i.ton.Bg(i.bg)
 
-	sealImg := seals.GetSealPngs().Get(i.kin.GetSeal())
+	sealImg := res.GetSealAll()[i.kin.GetSeal()]
 	if i.sealOn && i.seal == nil {
 		i.seal = eui.NewIcon(sealImg)
 		i.Add(i.seal)
@@ -77,15 +75,15 @@ func (i *KinIcon) Setup(kin *lib.Kin) {
 	i.nr.Bg(i.bg)
 	i.nr.Fg(i.fg)
 
-	img := symbols.GetSignPngs()[3]
+	img := res.GetSymbolAll()[3]
 	if i.signL == nil {
 		i.signL = eui.NewIcon(img)
 		i.Add(i.signL)
 	}
 	if i.kin.IsClearSign() {
-		i.signL.SetIcon(symbols.GetSignPngs()[0])
+		i.signL.SetIcon(res.GetSymbolAll()[0])
 	} else if i.kin.IsHiddenSign() {
-		i.signL.SetIcon(symbols.GetSignPngs()[1])
+		i.signL.SetIcon(res.GetSymbolAll()[1])
 	} else {
 		i.signL.SetIcon(img)
 	}
@@ -96,7 +94,7 @@ func (i *KinIcon) Setup(kin *lib.Kin) {
 		i.Add(i.signR)
 	}
 	if i.kin.IsPolar() {
-		i.signR.SetIcon(symbols.GetSignPngs()[2])
+		i.signR.SetIcon(res.GetSymbolAll()[2])
 	} else {
 		i.signR.SetIcon(img)
 	}

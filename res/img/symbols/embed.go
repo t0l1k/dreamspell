@@ -1,11 +1,7 @@
 package symbols
 
 import (
-	"bytes"
 	_ "embed"
-	"image"
-
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 var (
@@ -17,17 +13,6 @@ var (
 	PolarSymbolPng []byte
 	//go:embed  empty.png
 	EmptySymbolPng []byte
+	//go:embed  crystal.png
+	CrystalPng []byte
 )
-
-func GetSignPngs() (arr []*ebiten.Image) {
-	signPngs := [][]byte{ClearSignSymbolPng, HiddenSignSymbolPng, PolarSymbolPng, EmptySymbolPng}
-	for _, png := range signPngs {
-		img, _, err := image.Decode(bytes.NewReader(png))
-		if err != nil {
-			panic(err)
-		}
-		im := ebiten.NewImageFromImage(img)
-		arr = append(arr, im)
-	}
-	return arr
-}

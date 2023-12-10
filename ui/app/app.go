@@ -1,6 +1,8 @@
 package app
 
-import "github.com/t0l1k/eui"
+import (
+	"github.com/t0l1k/eui"
+)
 
 func NewGame() *eui.Ui {
 	u := eui.GetUi()
