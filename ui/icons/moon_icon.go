@@ -2,32 +2,38 @@ package icons
 
 import (
 	"github.com/t0l1k/dreamspell/lib"
+	"github.com/t0l1k/dreamspell/res"
 	"github.com/t0l1k/eui"
 )
 
 type MoonIcon struct {
 	eui.View
-	icon *KinIcon
+	icon *eui.Icon
 	lbl  *eui.Text
 }
 
-func NewMoonIcon(moonKin *lib.Kin) *MoonIcon {
+func NewMoonIcon(moonNr int) *MoonIcon {
 	i := &MoonIcon{}
 	i.SetupView()
-	i.icon = NewKinSealIcon(moonKin)
+
+	i.icon = eui.NewIcon(res.GetMoonTonAll()[lib.Ton(moonNr-1)])
 	i.Add(i.icon)
-	i.lbl = eui.NewText("Кин луны")
+	i.lbl = eui.NewText("Тотем луны")
 	i.Add(i.lbl)
-	i.Setup(moonKin)
+	i.Setup(moonNr)
 	return i
 }
 
-func (i *MoonIcon) Setup(kin *lib.Kin) {
-	i.icon.Setup(kin)
-	i.Bg(i.icon.GetBg())
-	i.Fg(i.icon.GetFg())
-	i.lbl.Bg(i.icon.GetBg())
-	i.lbl.Fg(i.icon.GetFg())
+func (i *MoonIcon) Setup(moonNr int) {
+	i.icon.SetIcon(res.GetMoonTonAll()[lib.Ton(moonNr-1)])
+	str := lib.Ton(moonNr).TotemRus()
+	i.lbl.SetText("Тотем " + str)
+	bg := eui.White
+	fg := eui.Black
+	i.Bg(bg)
+	i.Fg(fg)
+	i.lbl.Bg(bg)
+	i.lbl.Fg(fg)
 }
 
 func (i *MoonIcon) Resize(rect []int) {
@@ -35,5 +41,5 @@ func (i *MoonIcon) Resize(rect []int) {
 	x, y := i.GetRect().X, i.GetRect().Y
 	sz := i.GetRect().GetLowestSize() / 8
 	i.icon.Resize([]int{x, y, sz * 8, sz * 6})
-	i.lbl.Resize([]int{x + sz, y + sz*6, sz * 6, sz * 2})
+	i.lbl.Resize([]int{x, y + sz*6, sz * 8, sz * 2})
 }

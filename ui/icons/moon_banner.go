@@ -4,17 +4,16 @@ import (
 	"time"
 
 	"github.com/t0l1k/dreamspell/lib"
-	"github.com/t0l1k/dreamspell/res"
 	"github.com/t0l1k/eui"
 )
 
 type MoonBanner struct {
 	eui.View
 	dt                              time.Time
-	lblTotem, moonLbl               *eui.Text
+	lblMoonKin, moonLbl             *eui.Text
 	moonQuestionLbl, moonFuncLbl    *eui.Text
 	moonFunc0, moonFunc1, moonFunc2 *eui.Text
-	moonTonImg                      *eui.Icon
+	moonKinImg                      *KinIcon
 	str3                            []string
 	YearBanner                      *YearBanner
 }
@@ -24,13 +23,13 @@ func NewMoonBanner(dt time.Time) *MoonBanner {
 	i.SetupView()
 	i.dt = dt
 
-	_, moonNr := i.calcTm()
+	_, moonKin, _ := i.calcTm()
 
-	i.moonTonImg = eui.NewIcon(res.GetMoonTonAll()[lib.Ton(moonNr-1)])
-	i.Add(i.moonTonImg)
+	i.moonKinImg = NewKinSealIcon(moonKin)
+	i.Add(i.moonKinImg)
 
-	i.lblTotem = eui.NewText("")
-	i.Add(i.lblTotem)
+	i.lblMoonKin = eui.NewText("Кин луны")
+	i.Add(i.lblMoonKin)
 	i.moonLbl = eui.NewText("")
 	i.Add(i.moonLbl)
 	i.moonQuestionLbl = eui.NewText("")
@@ -54,18 +53,19 @@ func NewMoonBanner(dt time.Time) *MoonBanner {
 func (i *MoonBanner) Setup(dt0 time.Time) {
 	i.dt = dt0
 
-	_, moonNr := i.calcTm()
+	_, moonKin, moonNr := i.calcTm()
 
 	bg0 := eui.White
 	fg0 := eui.Black
 	i.Bg(bg0)
 
-	i.moonTonImg.SetIcon(res.GetMoonTonAll()[lib.Ton(moonNr-1)])
+	i.moonKinImg.Setup(moonKin)
 
-	s := lib.Ton(moonNr).TotemRus()
-	i.lblTotem.SetText("Тотем " + s)
-	i.lblTotem.Bg(bg0)
-	i.lblTotem.Fg(fg0)
+	bg1 := i.moonKinImg.GetBg()
+	fg1 := i.moonKinImg.GetFg()
+
+	i.lblMoonKin.Bg(bg1)
+	i.lblMoonKin.Fg(fg1)
 
 	str := lib.Ton(moonNr).StringRus() + " Луна"
 	i.moonLbl.SetText(str)
@@ -96,11 +96,12 @@ func (i *MoonBanner) Setup(dt0 time.Time) {
 	i.YearBanner.Setup(dt0)
 }
 
-func (i *MoonBanner) calcTm() (*lib.Convert, int) {
+func (i *MoonBanner) calcTm() (*lib.Convert, *lib.Kin, int) {
 	layout := "2006.01.02"
 	tm0 := lib.NewConvert(i.dt.Format(layout))
+	moonKin := tm0.FindMoonKin()
 	moonNr := tm0.FindMoonNr()
-	return tm0, moonNr
+	return tm0, moonKin, moonNr
 }
 
 func (i *MoonBanner) Resize(rect []int) {
@@ -108,16 +109,17 @@ func (i *MoonBanner) Resize(rect []int) {
 	x, y, w, _ := i.GetRect().X, i.GetRect().Y, i.GetRect().W, i.GetRect().H
 	sz8 := i.GetRect().GetLowestSize() / 8
 	cellSize := w / 8
-	i.moonTonImg.Resize([]int{x, y, cellSize, sz8 * 6})
-	i.lblTotem.Resize([]int{x, y + sz8*6, cellSize, sz8 * 2})
-	i.moonLbl.Resize([]int{x + cellSize, y, cellSize * 4, cellSize / 2})
-	i.moonQuestionLbl.Resize([]int{x + cellSize, y + cellSize/2, cellSize * 3, sz8 * 2})
-	i.moonFuncLbl.Resize([]int{x + cellSize, y + sz8*6, cellSize * 3, sz8 * 2})
+	i.moonLbl.Resize([]int{x, y, cellSize * 4, cellSize / 2})
+	i.moonQuestionLbl.Resize([]int{x, y + cellSize/2, cellSize * 3, sz8 * 2})
+	i.moonFuncLbl.Resize([]int{x, y + sz8*6, cellSize * 3, sz8 * 2})
 
 	sz8a := int(float64(sz8) * 1.2)
-	i.moonFunc0.Resize([]int{x + cellSize*4, y + sz8*4, cellSize, sz8a})
-	i.moonFunc1.Resize([]int{x + cellSize*4, y + sz8*4 + sz8a, cellSize, sz8a})
-	i.moonFunc2.Resize([]int{x + cellSize*4, y + sz8*4 + sz8a*2, cellSize, sz8a})
+	i.moonFunc0.Resize([]int{x + cellSize*3, y + sz8*4, cellSize, sz8a})
+	i.moonFunc1.Resize([]int{x + cellSize*3, y + sz8*4 + sz8a, cellSize, sz8a})
+	i.moonFunc2.Resize([]int{x + cellSize*3, y + sz8*4 + sz8a*2, cellSize, sz8a})
+
+	i.moonKinImg.Resize([]int{x + cellSize*4, y, cellSize, sz8 * 6})
+	i.lblMoonKin.Resize([]int{x + cellSize*4, y + sz8*6, cellSize, sz8 * 2})
 
 	i.YearBanner.Resize([]int{x + cellSize*5, y, cellSize * 3, cellSize})
 }

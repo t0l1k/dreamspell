@@ -1,6 +1,7 @@
 package icons
 
 import (
+	"image/color"
 	"strconv"
 	"time"
 
@@ -70,8 +71,14 @@ func (y *YearBanner) Setup(dt0 time.Time) {
 	y.lblNs.Bg(y.yearKinIcon.GetBg())
 	y.lblNs.Fg(y.yearKinIcon.GetFg())
 
-	bg1 := eui.YellowGreen
+	moonKinColor := tm0.FindMoonKin().GetColor()
+	clrs := []color.RGBA{eui.Red, eui.White, eui.Blue, eui.Yellow}
+	nr := moonKinColor - 1
+	bg1 := clrs[nr]
 	fg1 := eui.Black
+	if tm0.FindMoonKin().IsPga() {
+		bg1 = eui.Green
+	}
 
 	str := lib.Ton(moonNr).MoonNrRus() + " Луна"
 
