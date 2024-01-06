@@ -208,9 +208,11 @@ func (c *Convert) FindKin() *Kin {
 	return GetTzolkin().GetKin(nr)
 }
 
+var weekDaysShort = []string{"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"}
+
 func (c Convert) Strings() []string {
 	y, m, d := c.tm.Date()
-	dtWeekDay := c.tm.Weekday().String()[:3]
+	dtWeekDay := weekDaysShort[c.tm.Weekday()]
 	if isLeapYear(y) && m == time.February && d >= 28 {
 		s := dtWeekDay
 		switch d {
