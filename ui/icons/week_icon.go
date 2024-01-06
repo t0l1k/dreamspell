@@ -9,11 +9,18 @@ import (
 	"github.com/t0l1k/eui"
 )
 
+const (
+	redWeek    = "Инициация"
+	whiteWeek  = "Очищение"
+	blueWeek   = "Трансформация"
+	yellowWeek = "Созревание"
+)
+
 type MoonWeekIcon struct {
 	eui.View
 	week, mweek, qweek int
 	moonIcon, quarIcon *eui.Icon
-	yearLbl            *eui.Text
+	yearLbl, weekLbl   *eui.Text
 }
 
 func NewMoonWeekIcon(week int) *MoonWeekIcon {
@@ -26,6 +33,8 @@ func NewMoonWeekIcon(week int) *MoonWeekIcon {
 	i.Add(i.quarIcon)
 	i.yearLbl = eui.NewText("")
 	i.Add(i.yearLbl)
+	i.weekLbl = eui.NewText("")
+	i.Add(i.weekLbl)
 	i.Setup(week)
 	return i
 }
@@ -35,6 +44,8 @@ func (i *MoonWeekIcon) Setup(week int) {
 	i.moonIcon.SetIcon(res.GetTonAll()[lib.Ton(i.mweek-1)])
 	i.quarIcon.SetIcon(res.GetTonAll()[lib.Ton(i.qweek-1)])
 	i.yearLbl.SetText(strconv.Itoa(i.week))
+	strs := []string{redWeek, whiteWeek, blueWeek, yellowWeek}
+	i.weekLbl.SetText(strs[i.mweek-1])
 	clrs := []color.Color{eui.Red, eui.White, eui.Blue, eui.Yellow}
 	bg := clrs[int(lib.SealColor(i.mweek)-1)]
 	i.Bg(bg)
@@ -42,6 +53,8 @@ func (i *MoonWeekIcon) Setup(week int) {
 	i.quarIcon.Bg(bg)
 	i.yearLbl.Bg(bg)
 	i.yearLbl.Fg(eui.Black)
+	i.weekLbl.Bg(bg)
+	i.weekLbl.Fg(eui.Black)
 }
 
 func (i *MoonWeekIcon) calcWeekNrs(week int) {
