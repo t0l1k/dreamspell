@@ -1,7 +1,6 @@
 package icons
 
 import (
-	"image/color"
 	"strconv"
 
 	"github.com/t0l1k/dreamspell/lib"
@@ -43,31 +42,27 @@ func NewDayIcon(day string) *DayIcon {
 func (i *DayIcon) Setup(day string) {
 	dt := i.calcDt(day)
 	mweek := (dt.FindMoonDayNr()-1)/7 + 1
-
-	clrs := []color.Color{eui.Red, eui.White, eui.Blue, eui.Yellow}
-	fg := clrs[int(lib.SealColor(mweek)-1)]
-	r, g, b, _ := fg.RGBA()
-	bg := color.RGBA{uint8(r), uint8(g), uint8(b), 255}
-	fg2 := eui.White
-	if bg == fg2 || bg == eui.Yellow {
-		fg2 = eui.Black
-	}
+	bg, fg := lib.SealColor(mweek).Color()
+	// fg2 := eui.White
+	// if bg == fg2 || bg == eui.Yellow {
+	// 	fg2 = eui.Black
+	// }
 	i.Bg(bg)
 
 	i.lblDt.SetText(dt.Strings()[0])
 	i.lblDt.Bg(bg)
-	i.lblDt.Fg(fg2)
+	i.lblDt.Fg(fg)
 
 	i.lblWeekDay.SetText(dt.Strings()[1])
 	i.lblWeekDay.Bg(bg)
-	i.lblWeekDay.Fg(fg2)
+	i.lblWeekDay.Fg(fg)
 
 	i.lblYearDayNr.SetText(strconv.Itoa(dt.FindDayInYear()))
 	i.lblYearDayNr.Bg(bg)
-	i.lblYearDayNr.Fg(fg2)
+	i.lblYearDayNr.Fg(fg)
 
 	dNr := (dt.FindDayPlazma() + 2) % 4
-	fg = clrs[int(lib.SealColor(dNr))]
+	fg, _ = lib.SealColor(dNr + 1).Color()
 	if bg == fg {
 		fg = eui.Black
 	}

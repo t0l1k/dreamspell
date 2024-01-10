@@ -102,21 +102,13 @@ func (i *KinIcon) Setup(kin *lib.Kin) {
 }
 
 func (i *KinIcon) setColors() {
-	clrs := []color.RGBA{eui.Red, eui.White, eui.Blue, eui.Yellow}
 	nr := i.kin.GetColor() - 1
+	i.bg, i.fg = lib.SealColor(nr + 1).Color()
 	if i.kin.IsPga() {
 		i.bg = eui.Green
-		i.fg = eui.Black
-	} else {
-		i.bg = clrs[nr]
-		if i.bg == clrs[0] && i.bg == clrs[2] {
-			i.fg = eui.White
-		} else {
-			i.fg = eui.Black
-		}
+		i.fg = eui.White
 	}
 	if i.kin.IsCentral() {
-		i.bg = clrs[nr]
 		r := i.bg.R
 		g := i.bg.G
 		b := i.bg.B

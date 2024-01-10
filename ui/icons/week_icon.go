@@ -1,7 +1,6 @@
 package icons
 
 import (
-	"image/color"
 	"strconv"
 
 	"github.com/t0l1k/dreamspell/lib"
@@ -46,15 +45,14 @@ func (i *MoonWeekIcon) Setup(week int) {
 	i.yearLbl.SetText(strconv.Itoa(i.week))
 	strs := []string{redWeek, whiteWeek, blueWeek, yellowWeek}
 	i.weekLbl.SetText(strs[i.mweek-1])
-	clrs := []color.Color{eui.Red, eui.White, eui.Blue, eui.Yellow}
-	bg := clrs[int(lib.SealColor(i.mweek)-1)]
+	bg, fg := lib.SealColor(i.mweek).Color()
 	i.Bg(bg)
 	i.moonIcon.Bg(bg)
 	i.quarIcon.Bg(bg)
 	i.yearLbl.Bg(bg)
-	i.yearLbl.Fg(eui.Black)
+	i.yearLbl.Fg(fg)
 	i.weekLbl.Bg(bg)
-	i.weekLbl.Fg(eui.Black)
+	i.weekLbl.Fg(fg)
 }
 
 func (i *MoonWeekIcon) calcWeekNrs(week int) {
