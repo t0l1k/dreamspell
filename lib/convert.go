@@ -208,7 +208,7 @@ func (c *Convert) FindKin() *Kin {
 	return GetTzolkin().GetKin(nr)
 }
 
-var weekDaysShort = []string{"Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"}
+var weekDaysShort = []string{"Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"}
 
 func (c Convert) Strings() []string {
 	y, m, d := c.tm.Date()
