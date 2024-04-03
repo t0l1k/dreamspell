@@ -176,7 +176,7 @@ func TestNSStr(t *testing.T) {
 		"2023.07.03": "NS1.35.13.7 Kin 151",
 		"2023.11.12": "NS1.36.4.26 Kin 23",
 		"2023.07.12": "NS1.35.13.16 Kin 160",
-		// "2023.06.26": "NS1.35.12.28 Kin 144", // fail
+		"2023.06.26": "NS1.35.12.28 Kin 144", // fail
 	}
 	for k, v := range data {
 		got := lib.NewConvert(k).GetNS()

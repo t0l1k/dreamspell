@@ -48,8 +48,9 @@ func (c *Convert) FindMoonKin() *Kin {
 func (c *Convert) getNSCycle() (cycle, y int) {
 	year, m, d := c.tm.Date()
 	rootYear := 1987
-	if m <= time.July && d < 26 {
-		year -= 1
+	beginYear := time.Date(year, time.July, 26, 00, 00, 0, 0, time.Local)
+	if c.tm.Before(beginYear) {
+		year--
 	}
 	if year >= rootYear {
 		for rootYear <= year {
